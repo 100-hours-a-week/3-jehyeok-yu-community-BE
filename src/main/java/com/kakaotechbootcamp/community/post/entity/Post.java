@@ -49,4 +49,13 @@ public class Post extends BaseEntity {
     static public Post create(User author, String title, String content) {
         return new Post(author, title, content);
     }
+
+    // 엔티티 메서드
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
 }

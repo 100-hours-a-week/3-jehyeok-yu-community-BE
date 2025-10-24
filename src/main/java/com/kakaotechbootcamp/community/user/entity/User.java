@@ -21,7 +21,7 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
-    private long userId;
+    private Long userId;
 
     @Email
     @Column(unique = true, nullable = false, length = 255)
