@@ -12,11 +12,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Post extends BaseEntity {
 
     @Id
@@ -26,6 +28,7 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
+
 
     @Column(nullable = false, length = 26)
     private String title;
@@ -45,5 +48,18 @@ public class Post extends BaseEntity {
     // 팩토리메서드
     static public Post create(User author, String title, String content) {
         return new Post(author, title, content);
+    }
+
+    // 엔티티 메서드
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void incrementViewCount() {
+        this.viewCount += 1;
     }
 }

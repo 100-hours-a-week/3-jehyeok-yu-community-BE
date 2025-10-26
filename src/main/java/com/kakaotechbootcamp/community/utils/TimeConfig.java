@@ -1,7 +1,7 @@
 package com.kakaotechbootcamp.community.utils;
 
 import java.time.Clock;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +19,6 @@ public class TimeConfig {
 
     @Bean
     public DateTimeProvider dateTimeProvider(Clock clock) {
-        return () -> Optional.of(OffsetDateTime.now(clock));
+        return () -> Optional.of(Instant.now(clock));
     }
 }
