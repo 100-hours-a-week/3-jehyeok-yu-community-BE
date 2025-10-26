@@ -38,6 +38,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return new SliceImpl<>(rows, PageRequest.of(0, pageSize), hasNext);
     }
 
+    @Override
+    public Long incrementViewCount(long postId) {
+        return queryFactory.update(p)
+            .set(p.viewCount, p.viewCount.add(1))
+            .where(p.postId.eq(postId))
+            .execute();
+    }
+
     private BooleanExpression cursorCondition(Long cursor) {
         return (cursor == null || cursor <= 0) ? null : p.postId.lt(cursor);
     }

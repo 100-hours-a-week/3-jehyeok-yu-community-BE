@@ -57,11 +57,12 @@ public class PostService {
         return postsResponseDto;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponseDto getPost(Long postId, Long userId) {
-        return postRepository.findById(postId)
-            .map((p) -> toPostResponseDto(p, userId))
+        Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
+        postRepository.incrementViewCount(post.getPostId());
+        return toPostResponseDto(post, userId);
     }
 
     private PostResponseDto toPostResponseDto(Post post, Long userId) {
@@ -75,7 +76,7 @@ public class PostService {
             .createdAt(post.getCreatedAt())
             .commentCount(0)
             .likeCount(0)
-            .owner(userId == post.getAuthor().getUserId())
+            .owner(userId.equals(post.getAuthor().getUserId()))
             .build();
     }
 
