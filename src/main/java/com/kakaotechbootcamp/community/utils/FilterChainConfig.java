@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.utils;
 
 import com.kakaotechbootcamp.community.utils.security.filter.CorsFilter;
 import com.kakaotechbootcamp.community.utils.security.filter.ErrorHandlingFilter;
+import com.kakaotechbootcamp.community.utils.security.filter.SessionAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,16 @@ public class FilterChainConfig {
         filterRegistrationBean.setFilter(errorHandlingFilter);
         filterRegistrationBean.addUrlPatterns("/*");
         filterRegistrationBean.setOrder(2);
+        return filterRegistrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<SessionAuthFilter> registrationSessionAuthFilter(
+        SessionAuthFilter sessionAuthFilter) {
+        FilterRegistrationBean<SessionAuthFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(sessionAuthFilter);
+        filterRegistrationBean.addUrlPatterns("/*");
+        filterRegistrationBean.setOrder(3);
         return filterRegistrationBean;
     }
 }
