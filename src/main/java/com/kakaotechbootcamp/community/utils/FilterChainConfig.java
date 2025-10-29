@@ -26,7 +26,7 @@ public class FilterChainConfig {
         FilterRegistrationBean<ErrorHandlingFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(errorHandlingFilter);
         filterRegistrationBean.addUrlPatterns("/*");
-        filterRegistrationBean.setOrder(1);
+        filterRegistrationBean.setOrder(2);
         return filterRegistrationBean;
     }
 }
