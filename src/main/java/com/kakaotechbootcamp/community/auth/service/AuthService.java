@@ -7,5 +7,5 @@ public interface AuthService {
 
     void login(HttpServletResponse httpResponse, LoginRequestDto requestDto);
 
-    void logout(Long userId);
+    void logout(HttpServletResponse httResponse, String sessionKey);
 }

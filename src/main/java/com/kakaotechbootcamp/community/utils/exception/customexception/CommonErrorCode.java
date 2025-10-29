@@ -12,7 +12,7 @@ public enum CommonErrorCode implements ErrorCode {
     AUTH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_UNAUTHORIZED", "인증이 필요합니다."),
     AUTH_FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH_FORBIDDEN", "접근 권한이 없습니다."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "일시적인 오류가 발생했습니다."),
-    AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_INVALID_TOKEN", "유효하지 않은 토큰입니다."),
+    AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_INVALID_TOKEN", "세션이 만료됐습니다."),
     NOT_IMPLEMENTATION(HttpStatus.NOT_IMPLEMENTED, "NOT_IMPLEMENTED", "아직 미구현된 기능입니다.");
 
     private final HttpStatus status;
