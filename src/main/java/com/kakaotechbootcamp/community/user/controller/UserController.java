@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.user.controller;
 
 import com.kakaotechbootcamp.community.user.dto.request.SignUpRequestDto;
 import com.kakaotechbootcamp.community.user.dto.response.SignUpResponseDto;
+import com.kakaotechbootcamp.community.user.dto.response.UserProfileResponseDto;
 import com.kakaotechbootcamp.community.user.service.UserService;
 import com.kakaotechbootcamp.community.utils.exception.customexception.NotImplementException;
 import com.kakaotechbootcamp.community.utils.response.ApiResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +30,14 @@ public class UserController {
     public ResponseEntity<ApiResponse<SignUpResponseDto>> signUp(
         @RequestBody SignUpRequestDto dto) {
         SignUpResponseDto responseDto = userService.createUser(dto);
+        return ResponseEntity.ok(ApiResponse.ok(responseDto));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<UserProfileResponseDto>> getMyProfile(
+        @RequestAttribute(value = "userId") Long userId
+    ) {
+        UserProfileResponseDto responseDto = userService.getUserProfile(userId);
         return ResponseEntity.ok(ApiResponse.ok(responseDto));
     }
 

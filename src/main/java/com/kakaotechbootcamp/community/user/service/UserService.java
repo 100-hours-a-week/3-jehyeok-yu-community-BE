@@ -1,7 +1,9 @@
 package com.kakaotechbootcamp.community.user.service;
 
+import com.kakaotechbootcamp.community.auth.exception.UserNotFoundException;
 import com.kakaotechbootcamp.community.user.dto.request.SignUpRequestDto;
 import com.kakaotechbootcamp.community.user.dto.response.SignUpResponseDto;
+import com.kakaotechbootcamp.community.user.dto.response.UserProfileResponseDto;
 import com.kakaotechbootcamp.community.user.entity.User;
 import com.kakaotechbootcamp.community.user.exception.DuplicateException;
 import com.kakaotechbootcamp.community.user.exception.UserErrorCode;
@@ -40,5 +42,16 @@ public class UserService {
         if (userRepository.existsByNickname(nickname)) {
             throw new DuplicateException(UserErrorCode.DUPLICATE_ERROR);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfileResponseDto getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        return toProfileDto(user);
+    }
+
+    private UserProfileResponseDto toProfileDto(User user) {
+        return new UserProfileResponseDto(user.getUserId(), user.getNickname(), null);
     }
 }
