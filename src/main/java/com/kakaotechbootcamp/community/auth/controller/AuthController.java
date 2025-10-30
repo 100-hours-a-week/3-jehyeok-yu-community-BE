@@ -4,14 +4,13 @@ import com.kakaotechbootcamp.community.auth.dto.request.LoginRequestDto;
 import com.kakaotechbootcamp.community.auth.service.AuthService;
 import com.kakaotechbootcamp.community.utils.exception.customexception.NotImplementException;
 import com.kakaotechbootcamp.community.utils.response.ApiResponse;
-import com.kakaotechbootcamp.community.utils.security.AuthPrincipal;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +29,7 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+
     @PutMapping
     public ResponseEntity<ApiResponse<Void>> refresh() {
         throw new NotImplementException();
@@ -37,8 +37,9 @@ public class AuthController {
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> logout(
-        @AuthenticationPrincipal AuthPrincipal authPrincipal) {
-        authService.logout(authPrincipal.getUserId());
+        @RequestAttribute("sessionKey") String sessionKey,
+        HttpServletResponse response) {
+        authService.logout(response, sessionKey);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }
