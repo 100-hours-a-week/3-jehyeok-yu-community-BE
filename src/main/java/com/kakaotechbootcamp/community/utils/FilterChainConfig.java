@@ -1,0 +1,21 @@
+package com.kakaotechbootcamp.community.utils;
+
+import com.kakaotechbootcamp.community.utils.security.filter.CorsFilter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@RequiredArgsConstructor
+public class FilterChainConfig {
+
+    @Bean
+    public FilterRegistrationBean<CorsFilter> registrationCorsFilter(CorsFilter corsFilter) {
+        FilterRegistrationBean<CorsFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(corsFilter);
+        filterRegistrationBean.addUrlPatterns("/*");
+        filterRegistrationBean.setOrder(1);
+        return filterRegistrationBean;
+    }
+}
