@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,9 +15,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class CorsFilter extends OncePerRequestFilter {
 
-    private final List<String> allowedOrigin = List.of("http://localhost:3000");
+    private final List<String> allowedOrigin;
     @Value("${aws.public.domain}")
     private String awsPublicDomain;
+
+    public CorsFilter() {
+        this.allowedOrigin = new ArrayList<>();
+        allowedOrigin.add("http://localhost:3000");
+    }
 
     @PostConstruct
     void init() {
