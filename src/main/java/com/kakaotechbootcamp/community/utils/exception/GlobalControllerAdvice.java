@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -23,6 +24,12 @@ public class GlobalControllerAdvice {
     public ResponseEntity<ApiResponse<?>> handle(BusinessException e) {
         return ResponseEntity.status(e.getErrorCode().getStatus())
             .body(ApiResponse.error(ApiError.from(e)));
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<ApiResponse<?>> handleCookieException(MissingRequestCookieException ex) {
+        return ResponseEntity.status(ex.getCookieName().equals("refreshToken") ? 401 : 500)
+            .body(ApiResponse.error(ApiError.from(CommonErrorCode.LOGIN_REQUIRED)));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -45,7 +52,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAny(Exception ex) {
         log.error("[예기치 못한 Exception 발생] {}", ex.getLocalizedMessage());
-
+        ex.printStackTrace();
         ApiError apiErr = ApiError.from(CommonErrorCode.INTERNAL_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiResponse.error(apiErr));
