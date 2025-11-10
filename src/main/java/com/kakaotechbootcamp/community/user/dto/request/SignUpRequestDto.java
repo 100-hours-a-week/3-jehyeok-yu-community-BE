@@ -1,11 +1,9 @@
 package com.kakaotechbootcamp.community.user.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class SignUpRequestDto {
 
     @NotNull
@@ -14,5 +12,5 @@ public class SignUpRequestDto {
     private String password;
     @NotNull
     private String nickname;
-    private Long imageId;
+    private long imageId;
 }

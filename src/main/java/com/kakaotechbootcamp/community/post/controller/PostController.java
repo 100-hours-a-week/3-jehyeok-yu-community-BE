@@ -6,15 +6,16 @@ import com.kakaotechbootcamp.community.post.dto.response.PostResponseDto;
 import com.kakaotechbootcamp.community.post.dto.response.PostsResponseDto;
 import com.kakaotechbootcamp.community.post.service.PostService;
 import com.kakaotechbootcamp.community.utils.response.ApiResponse;
+import com.kakaotechbootcamp.community.utils.security.AuthPrincipal;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,9 +30,9 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> create(
-        @RequestAttribute(value = "userId") Long userId,
+        @AuthenticationPrincipal AuthPrincipal principal,
         @RequestBody PostCreateRequestDto req) {
-        postService.create(userId, req);
+        postService.create(principal.getUserId(), req);
         return ResponseEntity.noContent().build();
     }
 
@@ -45,18 +46,18 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostResponseDto>> getPost(
-        @RequestAttribute(value = "userId") Long userId,
+        @AuthenticationPrincipal AuthPrincipal principal,
         @PathVariable @Min(1) Long postId) {
         return ResponseEntity.ok(
-            ApiResponse.ok(postService.getPost(postId, userId)));
+            ApiResponse.ok(postService.getPost(postId, principal.getUserId())));
     }
 
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> updatePost(
-        @RequestAttribute(value = "userId") Long userId,
+        @AuthenticationPrincipal AuthPrincipal principal,
         @PathVariable Long postId,
         @RequestBody PostUpdateRequestDto req) {
-        postService.update(postId, req, userId);
+        postService.update(postId, req, principal.getUserId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.ok(null));
     }
 }

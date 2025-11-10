@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import java.time.Instant;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,30 +26,27 @@ public class Refreshtoken {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @Getter
     private User user;
 
-    @Column(length = 512)
-    @Getter
-    private String refreshtoken;
+    @Column(length = 100)
+    private String refreshHash;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column
-    @Getter
     private Instant expiresAt;
 
-    private Refreshtoken(User user, String refreshtoken, Instant expiresAt) {
+    private Refreshtoken(User user, String refreshHash, Instant expiresAt) {
         this.user = user;
-        this.refreshtoken = refreshtoken;
+        this.refreshHash = refreshHash;
         this.expiresAt = expiresAt;
     }
 
     // 팩토리 메서드
-    static public Refreshtoken create(User user, String refreshToken, Instant expiresAt) {
-        return new Refreshtoken(user, refreshToken, expiresAt);
+    static public Refreshtoken create(User user, String refreshHash, Instant expiresAt) {
+        return new Refreshtoken(user, refreshHash, expiresAt);
     }
 
     // 도메인 메서드
@@ -62,17 +58,13 @@ public class Refreshtoken {
 
     // 즉시 무효화
     public void revokeNow() {
-        this.refreshtoken = null;
+        this.refreshHash = null;
         this.expiresAt = null;
     }
 
     // 해시 교체
-    public void replaceHash(String newTokenValue, Instant newExpiresAt) {
-        this.refreshtoken = newTokenValue;
+    public void replaceHash(String newHash, Instant newExpiresAt) {
+        this.refreshHash = newHash;
         this.expiresAt = newExpiresAt;
-    }
-
-    public boolean isExpired(Instant now) {
-        return expiresAt == null || expiresAt.isBefore(now);
     }
 }
