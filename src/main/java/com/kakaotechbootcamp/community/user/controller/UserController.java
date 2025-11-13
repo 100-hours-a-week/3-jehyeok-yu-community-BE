@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.user.controller;
 
 import com.kakaotechbootcamp.community.user.dto.request.SignUpRequestDto;
 import com.kakaotechbootcamp.community.user.dto.response.SignUpResponseDto;
+import com.kakaotechbootcamp.community.user.dto.response.UserDetailResponseDto;
 import com.kakaotechbootcamp.community.user.service.UserService;
 import com.kakaotechbootcamp.community.utils.exception.customexception.NotImplementException;
 import com.kakaotechbootcamp.community.utils.response.ApiResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +34,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Void> getUserDetail() {
+    public ResponseEntity<ApiResponse<UserDetailResponseDto>> getUserDetail(
+        @RequestAttribute("userId") Long userId) {
+        UserDetailResponseDto responseDto = userService.getUserDetail(userId);
         throw new NotImplementException();
     }
 

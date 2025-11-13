@@ -25,6 +25,7 @@ public class User extends BaseEntity {
 
     @Email
     @Column(unique = true, nullable = false, length = 255)
+    @Getter
     private String email;
 
     @Length(min = 2, max = 10)

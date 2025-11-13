@@ -1,7 +1,9 @@
 package com.kakaotechbootcamp.community.utils.security;
 
+import com.kakaotechbootcamp.community.utils.security.dto.AccessTokenPayload;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +14,8 @@ import java.security.Key;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -43,29 +47,37 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createAccessToken(Long userId) {
-        return createToken(userId, accessTtlMillis);
-    }
-
-    /**
-     * 남겨놓은 이유 : jwt로 할지 불투명 토큰으로 할지 아직까지도 못정해서 일단 두었습니다...
-     */
-    public String createRefreshToken(Long userId) {
-        return createToken(userId, refreshTtlMillis);
-    }
-
-    public String createToken(long userId, long accessTtlMillis) {
-        Instant now = Instant.now(clock);
-        return Jwts.builder()
-            .setSubject(String.valueOf(userId))
-            .setIssuedAt(Date.from(now))
-            .setExpiration(new Date(now.toEpochMilli() + accessTtlMillis))
+    public String createAccessToken(Long userId, AccessTokenPayload payload) {
+        return baseToken(userId, accessTtlMillis)
+            .addClaims(makeClaims(payload))
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }
 
+    public String createRefreshToken(Long userId) {
+        return baseToken(userId, refreshTtlMillis)
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact();
+    }
+
+    private JwtBuilder baseToken(long userId, long ttlMillis) {
+        Instant now = Instant.now(clock);
+        return Jwts.builder()
+            .setSubject(Long.toString(userId))
+            .setIssuedAt(Date.from(now))
+            .setExpiration(new Date(now.toEpochMilli() + ttlMillis));
+    }
+
     public Jws<Claims> parse(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    }
+
+    private Map<String, Object> makeClaims(AccessTokenPayload payload) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", "user");
+        claims.put("nickname", payload.getNickname());
+        claims.put("imagePath", payload.getImagePath());
+        return claims;
     }
 
     public Long userId(String token) {
