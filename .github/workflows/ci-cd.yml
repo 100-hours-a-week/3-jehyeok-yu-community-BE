@@ -24,7 +24,7 @@ jobs:
       - name: Build and Push Image
         run: |
           export BE_PORT=8080
-          cat ${{ secrets.APP_YML }} > ./application.yml
+          echo "${{ secrets.APP_YML }}" > ./application.yml
           docker build -t ${{ secrets.DOCKER_USER }}/community-be:latest .
           docker push ${{ secrets.DOCKER_USER }}/community-be:latest
 
