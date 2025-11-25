@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 *application.yml
 *application.properties
+*application*.yml
 
 ## Q클래스 ##
 **/generated/**/Q*.java
