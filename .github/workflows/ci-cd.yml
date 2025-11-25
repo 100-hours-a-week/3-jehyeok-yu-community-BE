@@ -25,7 +25,7 @@ jobs:
         run: |
           export BE_PORT=8080
           echo "${{ secrets.APP_YML }}" > ./application.yml
-          docker build -t ${{ secrets.DOCKER_USER }}/community-be:latest .
+          docker build -t registry.${{ secrets.DOCKER_USER }}/community-be:latest .
           docker push registry.${{ secrets.DOCKER_USER }}/community-be:latest
 
   deploy:
