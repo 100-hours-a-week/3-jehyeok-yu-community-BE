@@ -1,0 +1,50 @@
+name: backend ci-cd
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Registry Login
+        uses: docker/login-action@v3
+        with:
+          registry: registry.${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # 우선 테스트 생략
+      # 빌드 후 푸시
+      - name: Build and Push Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/community-be:latest .
+          docker push ${{ secrets.DOCKER_USER }}/community-be:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+    steps:
+      - name: set-up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+            cd /home/${{ secrets.SERVER_USER }}/compose/app
+            docker compose pull community-be
+            docker compose up -d community-be
+          EOF
+            
+          
+          
+          
