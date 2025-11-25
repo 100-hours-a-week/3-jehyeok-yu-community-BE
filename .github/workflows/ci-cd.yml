@@ -23,6 +23,7 @@ jobs:
       # 빌드 후 푸시
       - name: Build and Push Image
         run: |
+          export BE_PORT=8080
           echo ${{ secrets.APP_YML }} > ./application.yml
           docker build -t ${{ secrets.DOCKER_USER }}/community-be:latest .
           docker push ${{ secrets.DOCKER_USER }}/community-be:latest
