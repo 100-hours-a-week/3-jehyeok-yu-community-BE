@@ -46,7 +46,7 @@ jobs:
             cd /home/${{ secrets.SERVER_USER }}/compose/app
             docker compose pull community-be
             docker compose up -d community-be
-            docker compose restart nginx -d
+            docker compose restart nginx
           EOF
             
           
