@@ -24,7 +24,7 @@ jobs:
       - name: Build and Push Image
         run: |
           export BE_PORT=8080
-          echo "${{ secrets.APP_YML }}" > ./application.yml
+          echo "${{ secrets.APP_YML }}" > ./src/main/resources/application-prod.yml
           docker build -t registry.${{ secrets.SERVER_HOST }}/community-be:latest .
           docker push registry.${{ secrets.SERVER_HOST }}/community-be:latest
 
