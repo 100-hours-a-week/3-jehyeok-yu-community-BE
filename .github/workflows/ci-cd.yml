@@ -49,7 +49,7 @@ jobs:
               echo "${{ secrets.DOCKER_TOKEN }}" | docker login registry.${{ secrets.SERVER_HOST}} -u "${{ secrets.DOCKER_USER }}" --password-stdin
               docker compose pull community-be
               docker compose up -d community-be
-            INNER
+          INNER
           OUTER
             
           
