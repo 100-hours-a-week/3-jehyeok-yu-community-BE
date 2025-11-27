@@ -43,8 +43,8 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -i ~/.ssh/id_rsa  ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-            cd /home/${{ secrets.SERVER_USER }}/.ssh
-            ssh -i ~/${{ secrets.TUNNELING_KEY}}  ${{ secrets.TUNNELING_SERVER_USER }}@${{ secrets.TUNNELING_SERVER_HOST }} << EOF
+            cd /home/${{ secrets.SERVER_USER }}
+            ssh -i ~/${{ secrets.TUNNELING_KEY }}  ${{ secrets.TUNNELING_SERVER_USER }}@${{ secrets.TUNNELING_SERVER_HOST }} << EOF
               docker compose pull community-be
               docker compose up -d community-be
             EOF
