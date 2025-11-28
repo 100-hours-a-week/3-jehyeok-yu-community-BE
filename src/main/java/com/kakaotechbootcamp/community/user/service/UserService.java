@@ -24,9 +24,19 @@ public class UserService {
     public SignUpResponseDto createUser(SignUpRequestDto dto) {
         checkDuplicateAtUserEmail(dto.getEmail());
         checkDuplicateAtUserNickname(dto.getNickname());
-        User user = User.create(dto.getEmail(), dto.getNickname(),
-            encoder.encode(dto.getPassword()));
+        User user;
+        if (dto.getImage() == null) {
+            user = User.create(dto.getEmail(), dto.getNickname(),
+                encoder.encode(dto.getPassword()));
+        } else {
+            user = User.create(dto.getEmail(), dto.getNickname(),
+                encoder.encode(dto.getPassword()), dto.getImage());
+        }
+
         userRepository.save(user);
+
+        System.out.println(dto.getImage());
+        System.out.println(dto);
         return new SignUpResponseDto(user.getUserId());
     }
 
