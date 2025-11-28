@@ -1,11 +1,15 @@
 package com.kakaotechbootcamp.community.user.entity;
 
+import com.kakaotechbootcamp.community.image.entity.Image;
+import com.kakaotechbootcamp.community.user.dto.request.SignInImageDto;
 import com.kakaotechbootcamp.community.utils.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
@@ -38,6 +42,9 @@ public class User extends BaseEntity {
     @Getter
     private String password;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserImage userImage;
+
     // 팩토리 메서드
     private User(String email, String nickname, String password) {
         this.email = email;
@@ -47,5 +54,19 @@ public class User extends BaseEntity {
 
     static public User create(String email, String nickname, String password) {
         return new User(email, nickname, password);
+    }
+
+    static public User create(String email, String nickname, String password,
+        SignInImageDto imageDto) {
+        User createdUser = create(email, nickname, password);
+
+        Image image = Image.create(imageDto.getOriginalName(), imageDto.getObjectKey());
+        UserImage.create(createdUser, image, "default");
+
+        return createdUser;
+    }
+
+    public void linkUserImage(UserImage userImage) {
+        this.userImage = userImage;
     }
 }

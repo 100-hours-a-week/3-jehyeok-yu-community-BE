@@ -19,10 +19,10 @@ public class Image extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long imageId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String originalName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String objectKey;
 
     private Image(String originalName, String objectKey) {

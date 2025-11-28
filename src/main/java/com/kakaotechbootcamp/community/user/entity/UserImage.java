@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.user.entity;
 
 import com.kakaotechbootcamp.community.image.entity.Image;
 import com.kakaotechbootcamp.community.utils.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,7 +27,7 @@ public class UserImage extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", nullable = false, unique = true)
     private Image image;
 
@@ -41,6 +42,8 @@ public class UserImage extends BaseEntity {
 
     // 팩토리 메서드
     static public UserImage create(User user, Image image, String thumbnailObjectKey) {
-        return new UserImage(user, image, thumbnailObjectKey);
+        UserImage userImage = new UserImage(user, image, thumbnailObjectKey);
+        user.linkUserImage(userImage);
+        return userImage;
     }
 }
