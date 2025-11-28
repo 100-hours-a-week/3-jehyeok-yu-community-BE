@@ -8,4 +8,5 @@ import lombok.Getter;
 public class PresignedUrlDto {
 
     private String presignedPatchUrl;
+    private String objectKey;
 }

@@ -1,5 +1,6 @@
 package com.kakaotechbootcamp.community.image;
 
+import com.kakaotechbootcamp.community.image.dto.response.PresignedUrlDto;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
@@ -34,9 +35,13 @@ public class S3ClientCreator {
     }
 
 
-    public String getPresignedUrl() {
-        return createPresignedUrl("profile-origin", buildProfileImageKey(),
-            Collections.EMPTY_MAP);
+    public PresignedUrlDto getPresignedUrl() {
+        String objectKey = buildProfileImageKey();
+
+        String url = createPresignedUrl("profile-origin", buildProfileImageKey(),
+            Collections.emptyMap());
+
+        return new PresignedUrlDto(url, objectKey);
     }
 
     private String createPresignedUrl(String bucketName, String keyName,

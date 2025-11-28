@@ -12,6 +12,6 @@ public class ImageService {
     private final S3ClientCreator s3ClientCreator;
 
     public PresignedUrlDto getPresignedPatchUrl(String mode) {
-        return new PresignedUrlDto(s3ClientCreator.getPresignedUrl());
+        return s3ClientCreator.getPresignedUrl();
     }
 }
