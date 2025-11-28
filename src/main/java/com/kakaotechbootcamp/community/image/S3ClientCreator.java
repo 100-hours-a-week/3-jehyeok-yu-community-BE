@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -22,8 +23,11 @@ public class S3ClientCreator {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
+    private final ConcurrentHashMap<Long, String> presignStore;
+
 
     public S3ClientCreator() {
+        this.presignStore = new ConcurrentHashMap<>();
         this.s3Client = S3Client.builder()
             .region(Region.AP_NORTHEAST_2)  // 서울 리전
             .credentialsProvider(ProfileCredentialsProvider.create("default"))
@@ -35,16 +39,16 @@ public class S3ClientCreator {
     }
 
 
-    public PresignedUrlDto getPresignedUrl() {
+    public PresignedUrlDto getPutPresignedUrl() {
         String objectKey = buildProfileImageKey();
 
-        String url = createPresignedUrl("profile-origin", buildProfileImageKey(),
+        String url = createPutPresignedUrl("profile-origin", buildProfileImageKey(),
             Collections.emptyMap());
 
         return new PresignedUrlDto(url, objectKey);
     }
 
-    private String createPresignedUrl(String bucketName, String keyName,
+    private String createPutPresignedUrl(String bucketName, String keyName,
         Map<String, String> metadata) {
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
