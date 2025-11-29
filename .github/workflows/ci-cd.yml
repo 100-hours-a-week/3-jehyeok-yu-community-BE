@@ -49,7 +49,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa  ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << OUTER
             cd /home/${{ secrets.SERVER_USER }}
             ssh -i ~/${{ secrets.TUNNELING_KEY }}  ${{ secrets.TUNNELING_SERVER_USER }}@${{ secrets.TUNNELING_SERVER_HOST }} << INNER
-              cd /home/${{ secrets.TUNNELING_SERVER_USER }}/compose
+              cd /home/${{ secrets.TUNNELING_SERVER_USER }}/compose/app
               echo "${{ secrets.DOCKER_TOKEN }}" | docker login registry.${{ secrets.SERVER_HOST}} -u "${{ secrets.DOCKER_USER }}" --password-stdin
               docker compose pull community-be
               docker compose up -d community-be
