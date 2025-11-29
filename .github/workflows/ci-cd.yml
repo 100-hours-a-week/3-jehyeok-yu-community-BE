@@ -51,11 +51,11 @@ jobs:
             ssh -i ~/${{ secrets.TUNNELING_KEY }}  ${{ secrets.TUNNELING_SERVER_USER }}@${{ secrets.TUNNELING_SERVER_HOST }} << INNER
               cd /home/${{ secrets.TUNNELING_SERVER_USER }}/compose/app
               echo "${{ secrets.DOCKER_TOKEN }}" | docker login registry.${{ secrets.SERVER_HOST}} -u "${{ secrets.DOCKER_USER }}" --password-stdin \
-                || {echo "레지스트리 로그인 실패"; exit 1;}
+                || { echo "레지스트리 로그인 실패"; exit 1;}
               docker compose pull community-be \
-                || {echo "레지스트리에서 이미지 pull 실패"; exit 1;}
+                || { echo "레지스트리에서 이미지 pull 실패"; exit 1;}
               docker compose up -d community-be \
-                || {echo "컨테이너 실행 실패"; exit 1;}
+                || { echo "컨테이너 실행 실패"; exit 1;}
           INNER
           OUTER
             
