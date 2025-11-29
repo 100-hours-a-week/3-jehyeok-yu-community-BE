@@ -74,7 +74,7 @@ public class JwtTokenProvider {
 
     private Map<String, Object> makeClaims(AccessTokenPayload payload) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", "amdin");
+        claims.put("role", "user");
         claims.put("nickname", payload.getNickname());
         claims.put("imagePath", payload.getImagePath());
         return claims;
