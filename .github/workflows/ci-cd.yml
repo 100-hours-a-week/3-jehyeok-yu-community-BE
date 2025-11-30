@@ -24,7 +24,6 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
 
-      # 우선 테스트 생략
       # 빌드 후 푸시
       - name: Build and Push Image
         run: |
