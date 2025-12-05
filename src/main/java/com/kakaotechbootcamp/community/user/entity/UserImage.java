@@ -31,7 +31,7 @@ public class UserImage extends BaseEntity {
     @JoinColumn(name = "image_id", nullable = false, unique = true)
     private Image image;
 
-    @Column(nullable = false, length = 255, unique = true)
+    @Column(nullable = true, length = 255, unique = true)
     private String thumbnailObjectKey;
 
     private UserImage(User user, Image image, String thumbnailObjectKey) {
@@ -42,8 +42,13 @@ public class UserImage extends BaseEntity {
 
     // 팩토리 메서드
     static public UserImage create(User user, Image image, String thumbnailObjectKey) {
-        UserImage userImage = new UserImage(user, image, thumbnailObjectKey);
-        user.linkUserImage(userImage);
-        return userImage;
+        return new UserImage(user, image, thumbnailObjectKey);
+    }
+
+    public String getObjectKey() {
+        if (thumbnailObjectKey == null || thumbnailObjectKey.isBlank()) {
+            return image.getObjectKey();
+        }
+        return thumbnailObjectKey;
     }
 }

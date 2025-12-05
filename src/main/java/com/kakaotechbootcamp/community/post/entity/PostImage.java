@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.post.entity;
 
 import com.kakaotechbootcamp.community.image.entity.Image;
 import com.kakaotechbootcamp.community.utils.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +27,7 @@ public class PostImage extends BaseEntity {
     @JoinColumn(name = "post_id", nullable = false, unique = true)
     private Post post;
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", nullable = false, unique = true)
     private Image image;
 
@@ -37,5 +38,9 @@ public class PostImage extends BaseEntity {
 
     public static PostImage create(Post post, Image image) {
         return new PostImage(post, image);
+    }
+
+    public String getObjectKey() {
+        return image.getObjectKey();
     }
 }

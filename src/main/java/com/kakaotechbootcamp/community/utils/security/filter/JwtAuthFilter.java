@@ -28,7 +28,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         String method = request.getMethod();
-
+        if ("/images/url".equals(path) && "GET".equalsIgnoreCase(method)) {
+            String mode = request.getParameter("mode");
+            return "profile".equals(mode);
+        }
         return Arrays.stream(EXCLUDED_PATHS)
             .anyMatch(e -> e[0].equals(path) && e[1].equalsIgnoreCase(method));
     }
