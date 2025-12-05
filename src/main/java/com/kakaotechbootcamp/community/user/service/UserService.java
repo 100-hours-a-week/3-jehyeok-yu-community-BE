@@ -1,6 +1,8 @@
 package com.kakaotechbootcamp.community.user.service;
 
 import com.kakaotechbootcamp.community.auth.exception.UserNotFoundException;
+import com.kakaotechbootcamp.community.image.S3ClientCreator;
+import com.kakaotechbootcamp.community.image.entity.Image;
 import com.kakaotechbootcamp.community.user.dto.request.SignUpRequestDto;
 import com.kakaotechbootcamp.community.user.dto.response.SignUpResponseDto;
 import com.kakaotechbootcamp.community.user.dto.response.UserDetailResponseDto;
@@ -20,23 +22,32 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+    private final S3ClientCreator s3ClientCreator;
 
     public SignUpResponseDto createUser(SignUpRequestDto dto) {
         checkDuplicateAtUserEmail(dto.getEmail());
         checkDuplicateAtUserNickname(dto.getNickname());
-        User user;
-        if (dto.getImage() == null) {
-            user = User.create(dto.getEmail(), dto.getNickname(),
-                encoder.encode(dto.getPassword()));
-        } else {
-            user = User.create(dto.getEmail(), dto.getNickname(),
-                encoder.encode(dto.getPassword()), dto.getImage());
+
+        Image profileImage = null;
+        String thumbnailObjectKey = null;
+
+        if (dto.getImage() != null) {
+            profileImage = Image.create(
+                dto.getImage().getOriginalName(),
+                dto.getImage().getObjectKey()
+            );
+            thumbnailObjectKey = dto.getImage().getThumbnailObjectKey();
         }
 
-        userRepository.save(user);
+        User user = User.create(
+            dto.getEmail(),
+            dto.getNickname(),
+            encoder.encode(dto.getPassword()),
+            profileImage,
+            thumbnailObjectKey
+        );
 
-        System.out.println(dto.getImage());
-        System.out.println(dto);
+        userRepository.save(user);
         return new SignUpResponseDto(user.getUserId());
     }
 
@@ -54,9 +65,18 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public UserDetailResponseDto getUserDetail(Long userId) {
-        return userRepository.findById(userId)
-            .map(UserDetailResponseDto::from)
-            .orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        String objectKey = user.getObjectKey();
+        String presignedGetUrl = objectKey;
+        if (objectKey == null) {
+            String defaultKey = "public/image/profile/default-profile.png";
+            presignedGetUrl = s3ClientCreator.getPresignedGetUrl(defaultKey);
+        } else {
+            presignedGetUrl = s3ClientCreator.getPresignedGetUrl(objectKey);
+        }
+        return new UserDetailResponseDto(user.getUserId(), user.getEmail(), user.getNickname(),
+            presignedGetUrl);
     }
 }

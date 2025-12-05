@@ -36,8 +36,13 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserDetailResponseDto>> getUserDetail(
         @RequestAttribute("userId") Long userId) {
-        UserDetailResponseDto responseDto = userService.getUserDetail(userId);
-        throw new NotImplementException();
+        return ResponseEntity.ok(ApiResponse.ok(userService.getUserDetail(userId)));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserDetailResponseDto>> getMyDetail(
+        @RequestAttribute("userId") Long userId) {
+        return ResponseEntity.ok(ApiResponse.ok(userService.getUserDetail(userId)));
     }
 
     @DeleteMapping("/{userId}")
