@@ -9,4 +9,5 @@ public class PostCreateRequestDto {
 
     private final String title;
     private final String content;
+    private final PostImageCreateDto image;
 }

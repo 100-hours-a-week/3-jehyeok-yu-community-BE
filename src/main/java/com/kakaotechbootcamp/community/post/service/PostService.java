@@ -1,5 +1,7 @@
 package com.kakaotechbootcamp.community.post.service;
 
+import com.kakaotechbootcamp.community.image.S3ClientCreator;
+import com.kakaotechbootcamp.community.image.entity.Image;
 import com.kakaotechbootcamp.community.post.dto.request.PostCreateRequestDto;
 import com.kakaotechbootcamp.community.post.dto.request.PostUpdateRequestDto;
 import com.kakaotechbootcamp.community.post.dto.response.AuthorThumbNailDto;
@@ -26,10 +28,20 @@ public class PostService {
 
     public final PostRepository postRepository;
     public final UserRepository userRepository;
+    public final S3ClientCreator s3ClientCreator;
 
-    public void create(long userId, PostCreateRequestDto req) {
+    public void create(long userId, PostCreateRequestDto dto) {
         User user = userRepository.getReferenceById(userId);
-        Post post = Post.create(user, req.getTitle(), req.getContent());
+
+        Image postImage = null;
+        if (dto.getImage() != null) {
+            postImage = Image.create(
+                dto.getImage().getOriginalName(),
+                dto.getImage().getObjectKey()
+            );
+        }
+
+        Post post = Post.create(user, dto.getTitle(), dto.getContent(), postImage);
         postRepository.save(post);
     }
 
@@ -52,7 +64,9 @@ public class PostService {
             postList.add(
                 new PostThumbNailResponseDto(e.getTitle(), e.getPostId(), 0, 0, e.getViewCount(),
                     e.getCreatedAt(),
-                    new AuthorThumbNailDto(author.getNickname(), "default", author.getUserId())));
+                    new AuthorThumbNailDto(author.getNickname(),
+                        s3ClientCreator.getPresignedGetUrl(author.getObjectKey()),
+                        author.getUserId())));
         });
         return postsResponseDto;
     }
@@ -70,7 +84,11 @@ public class PostService {
             .postId(post.getPostId())
             .title(post.getTitle())
             .content(post.getContent())
+            .postImagePath(
+                s3ClientCreator.getPresignedGetUrl(post.getObjectKey()))
             .authorId(post.getAuthor().getUserId())
+            .authorThumbnailPath(
+                s3ClientCreator.getPresignedGetUrl(post.getAuthor().getObjectKey()))
             .nickname(post.getAuthor().getNickname())
             .viewCount(post.getViewCount())
             .createdAt(post.getCreatedAt())

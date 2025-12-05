@@ -13,7 +13,9 @@ public class PostResponseDto {
     private long postId;
     private String title;
     private String content;
+    private String postImagePath;
     private long authorId;
+    private String authorThumbnailPath;
     private String nickname;
     private long viewCount;
     private long likeCount;
