@@ -1,9 +1,12 @@
 package com.kakaotechbootcamp.community.image;
 
 import com.kakaotechbootcamp.community.image.dto.response.PresignedUrlDto;
+import com.kakaotechbootcamp.community.user.dto.CachedUrl;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +15,11 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
@@ -21,10 +27,12 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 @Slf4j
 public class S3ClientCreator {
 
+    private final static String BUCKET_NAME = "profile-origin";
+    private final static long CACHE_TTL_MS = 10 * 60 * 1000;
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
-    private final ConcurrentHashMap<Long, String> presignStore;
-
+    private final ConcurrentHashMap<String, CachedUrl> presignStore;
+    private final String[] AVAILABLE_IMAGE_TYPE = {"profile", "post"};
 
     public S3ClientCreator() {
         this.presignStore = new ConcurrentHashMap<>();
@@ -39,11 +47,15 @@ public class S3ClientCreator {
     }
 
 
-    public PresignedUrlDto getPutPresignedUrl() {
-        String objectKey = buildProfileImageKey();
+    public PresignedUrlDto getPutPresignedUrl(String mode) {
+        Optional<String> targetPath = Arrays.stream(AVAILABLE_IMAGE_TYPE)
+            .filter(s -> s.equals(mode))
+            .findFirst();
+        log.info("[getPutPresignedUrl] path : {}, and target {}", targetPath.get(), mode);
+        String path = targetPath.orElseThrow(PathNotFoundException::new);
+        String objectKey = buildProfileImageKey(path);
 
-        String url = createPutPresignedUrl("profile-origin", buildProfileImageKey(),
-            Collections.emptyMap());
+        String url = createPutPresignedUrl(BUCKET_NAME, objectKey, Collections.emptyMap());
 
         return new PresignedUrlDto(url, objectKey);
     }
@@ -72,8 +84,49 @@ public class S3ClientCreator {
     }
 
 
-    private String buildProfileImageKey() {
+    private String buildProfileImageKey(String mode) {
         String uuid = UUID.randomUUID().toString();
-        return "public/image/profile/" + uuid;
+        return "public/image/" + mode + "/" + uuid;
+    }
+
+
+    public String getPresignedGetUrl(String objectKey) {
+        if (objectKey == null) {
+            return null;
+        }
+        CachedUrl cached = presignStore.get(objectKey);
+
+        if (cached != null && !cached.isExpired()) {
+            return cached.getUrl();
+        }
+
+        String url = createPresignedGetUrl(BUCKET_NAME, objectKey);
+
+        CachedUrl newCache = new CachedUrl(
+            url,
+            System.currentTimeMillis() + CACHE_TTL_MS
+        );
+
+        presignStore.put(objectKey, newCache);
+        log.info("objectKey: [{}]", objectKey);
+        return url;
+    }
+
+    private String createPresignedGetUrl(String bucketName, String keyName) {
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(keyName)
+            .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofMinutes(10))
+            .getObjectRequest(objectRequest)
+            .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+        log.info("Presigned URL: [{}]", presignedRequest.url().toString());
+        log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
+
+        return presignedRequest.url().toExternalForm();
     }
 }
