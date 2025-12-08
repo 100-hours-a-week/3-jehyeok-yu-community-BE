@@ -22,8 +22,8 @@ public class ImageController {
 
     @GetMapping("/url")
     public ResponseEntity<ApiResponse<PresignedUrlDto>> getPresignedPatchUrl(
-        @RequestParam(value = "mode", required = false) String mode) {
-
+        @RequestParam(value = "mode", required = false) String mode
+    ) {
         return ResponseEntity.ok(ApiResponse.ok(imageService.getPresignedPatchUrl(mode)));
     }
 }

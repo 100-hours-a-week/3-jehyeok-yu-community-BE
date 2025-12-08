@@ -16,12 +16,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
 
 @Slf4j
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE user_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class User extends BaseEntity {
 
     @Id
@@ -45,6 +49,7 @@ public class User extends BaseEntity {
     private String password;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Getter
     private UserImage userImage;
 
     // 팩토리 메서드
@@ -76,5 +81,13 @@ public class User extends BaseEntity {
     public String getObjectKey() {
         log.info("getObject Key, {}", this.userImage);
         return this.userImage == null ? null : this.userImage.getObjectKey();
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void changePassword(String encode) {
+        this.password = encode;
     }
 }

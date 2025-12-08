@@ -6,6 +6,7 @@ import com.kakaotechbootcamp.community.auth.service.AuthService;
 import com.kakaotechbootcamp.community.utils.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(HttpServletResponse response,
         @RequestBody LoginRequestDto requestDto) {
         LoginResponseDto responseDto = authService.login(response, requestDto);
+        log.info("로그인 시도, {}", responseDto);
         return ResponseEntity.ok(ApiResponse.ok(responseDto));
     }
 

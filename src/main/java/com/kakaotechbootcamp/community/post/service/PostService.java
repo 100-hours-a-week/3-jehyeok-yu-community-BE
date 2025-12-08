@@ -1,6 +1,8 @@
 package com.kakaotechbootcamp.community.post.service;
 
+import com.kakaotechbootcamp.community.auth.exception.UserNotFoundException;
 import com.kakaotechbootcamp.community.image.S3ClientCreator;
+import com.kakaotechbootcamp.community.image.dto.response.PresignedUrlDto;
 import com.kakaotechbootcamp.community.image.entity.Image;
 import com.kakaotechbootcamp.community.post.dto.request.PostCreateRequestDto;
 import com.kakaotechbootcamp.community.post.dto.request.PostUpdateRequestDto;
@@ -8,9 +10,13 @@ import com.kakaotechbootcamp.community.post.dto.response.AuthorThumbNailDto;
 import com.kakaotechbootcamp.community.post.dto.response.PostResponseDto;
 import com.kakaotechbootcamp.community.post.dto.response.PostThumbNailResponseDto;
 import com.kakaotechbootcamp.community.post.dto.response.PostsResponseDto;
+import com.kakaotechbootcamp.community.post.dto.response.TogglePostLikeResponseDto;
 import com.kakaotechbootcamp.community.post.entity.Post;
+import com.kakaotechbootcamp.community.post.entity.PostImage;
+import com.kakaotechbootcamp.community.post.entity.PostLike;
 import com.kakaotechbootcamp.community.post.exception.PostNotFoundException;
-import com.kakaotechbootcamp.community.post.repository.PostRepository;
+import com.kakaotechbootcamp.community.post.repository.PostLikeRepository;
+import com.kakaotechbootcamp.community.post.repository.post.PostRepository;
 import com.kakaotechbootcamp.community.user.entity.User;
 import com.kakaotechbootcamp.community.user.repository.UserRepository;
 import com.kakaotechbootcamp.community.utils.exception.customexception.ForbiddenException;
@@ -29,6 +35,7 @@ public class PostService {
     public final PostRepository postRepository;
     public final UserRepository userRepository;
     public final S3ClientCreator s3ClientCreator;
+    private final PostLikeRepository postLikeRepository;
 
     public void create(long userId, PostCreateRequestDto dto) {
         User user = userRepository.getReferenceById(userId);
@@ -62,7 +69,9 @@ public class PostService {
         posts.stream().forEach(e -> {
             User author = e.getAuthor();
             postList.add(
-                new PostThumbNailResponseDto(e.getTitle(), e.getPostId(), 0, 0, e.getViewCount(),
+                new PostThumbNailResponseDto(e.getTitle(), e.getPostId(),
+                    postLikeRepository.countByPost_PostIdAndIsDeletedFalse(e.getPostId()), 0,
+                    e.getViewCount(),
                     e.getCreatedAt(),
                     new AuthorThumbNailDto(author.getNickname(),
                         s3ClientCreator.getPresignedGetUrl(author.getObjectKey()),
@@ -93,19 +102,82 @@ public class PostService {
             .viewCount(post.getViewCount())
             .createdAt(post.getCreatedAt())
             .commentCount(0)
-            .likeCount(0)
+            .likeCount(postLikeRepository.countByPost_PostIdAndIsDeletedFalse(post.getPostId()))
             .owner(userId.equals(post.getAuthor().getUserId()))
+            .isLiked(postLikeRepository.findByPost_PostIdAndUser_UserIdAndIsDeletedFalse(
+                    post.getPostId(), userId)
+                .isPresent())
             .build();
     }
 
     public void update(long postId, PostUpdateRequestDto req, long userId) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
+
         User author = post.getAuthor();
         if (!author.getUserId().equals(userId)) {
-            throw new ForbiddenException("게시물 접근");
+            throw new ForbiddenException("게시물 수정 접근");
         }
+
         post.updateContent(req.getContent());
         post.updateTitle(req.getTitle());
+
+        if (req.getImage() == null) {
+            return;
+        }
+        PostImage postImage = post.getPostImage();
+        if (postImage == null) {
+            Image image = Image.create(
+                req.getImage().getOriginalName(),
+                req.getImage().getObjectKey()
+            );
+            post.addPostImage(image);
+        } else {
+            postImage.changeOriginalName(req.getImage().getOriginalName());
+        }
+
+        s3ClientCreator.evictCache(post.getObjectKey());
+    }
+
+    @Transactional
+    public TogglePostLikeResponseDto toggleLike(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+
+        PostLike postLiked = postLikeRepository
+            .findByPost_PostIdAndUser_UserId(postId, userId)
+            .orElseGet(() -> PostLike.create(post, user));
+        postLikeRepository.save(postLiked);
+
+        postLiked.toggleLike();
+
+        long postLikeCount = postLikeRepository.countByPost_PostIdAndIsDeletedFalse(postId);
+        return new TogglePostLikeResponseDto(!postLiked.isDeleted(), postLikeCount);
+    }
+
+    public PresignedUrlDto getPatchUrl(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        if (!post.getAuthor().equals(user)) {
+            throw new ForbiddenException("게시물 수정 권한");
+        }
+        return post.getObjectKey() == null ? s3ClientCreator.getPutPresignedUrl("post")
+            : s3ClientCreator.getPutPresignedUrl("post", post.getObjectKey());
+    }
+
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        if (!post.getAuthor().equals(user)) {
+            throw new ForbiddenException("게시물 삭제 권한");
+        }
+        postRepository.delete(post);
     }
 }

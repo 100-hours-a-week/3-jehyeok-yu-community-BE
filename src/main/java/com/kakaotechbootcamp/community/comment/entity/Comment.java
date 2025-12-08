@@ -13,12 +13,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 
 @Entity
 @Table(name = "comments")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE comments SET deleted_at = now() WHERE comment_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Comment extends BaseEntity {
 
     @Id
@@ -45,5 +51,13 @@ public class Comment extends BaseEntity {
     // 팩토리 메서드
     static public Comment create(User author, Post post, String content) {
         return new Comment(author, post, content);
+    }
+
+    public Long getAuthorId() {
+        return this.author.getUserId();
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 }

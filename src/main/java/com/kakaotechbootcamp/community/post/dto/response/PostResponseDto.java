@@ -22,4 +22,5 @@ public class PostResponseDto {
     private long commentCount;
     private Instant createdAt;
     private boolean owner;
+    private boolean isLiked;
 }

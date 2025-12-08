@@ -46,6 +46,11 @@ public class S3ClientCreator {
             .build();
     }
 
+    public PresignedUrlDto getPutPresignedUrl(String mode, String objectKey) {
+        String url = createPutPresignedUrl(BUCKET_NAME, objectKey, Collections.emptyMap());
+
+        return new PresignedUrlDto(url, objectKey);
+    }
 
     public PresignedUrlDto getPutPresignedUrl(String mode) {
         Optional<String> targetPath = Arrays.stream(AVAILABLE_IMAGE_TYPE)
@@ -128,5 +133,13 @@ public class S3ClientCreator {
         log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
 
         return presignedRequest.url().toExternalForm();
+    }
+
+    public void evictCache(String objectKey) {
+        if (objectKey == null) {
+            return;
+        }
+        presignStore.remove(objectKey);
+        log.info("evict presign cache, objectKey = {}", objectKey);
     }
 }

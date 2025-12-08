@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.post.repository;
+package com.kakaotechbootcamp.community.post.repository.postimage;
 
 import com.kakaotechbootcamp.community.post.entity.PostImage;
 import org.springframework.data.jpa.repository.JpaRepository;
