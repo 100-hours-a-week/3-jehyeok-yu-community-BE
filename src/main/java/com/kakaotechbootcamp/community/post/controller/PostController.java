@@ -1,15 +1,18 @@
 package com.kakaotechbootcamp.community.post.controller;
 
+import com.kakaotechbootcamp.community.image.dto.response.PresignedUrlDto;
 import com.kakaotechbootcamp.community.post.dto.request.PostCreateRequestDto;
 import com.kakaotechbootcamp.community.post.dto.request.PostUpdateRequestDto;
 import com.kakaotechbootcamp.community.post.dto.response.PostResponseDto;
 import com.kakaotechbootcamp.community.post.dto.response.PostsResponseDto;
+import com.kakaotechbootcamp.community.post.dto.response.TogglePostLikeResponseDto;
 import com.kakaotechbootcamp.community.post.service.PostService;
 import com.kakaotechbootcamp.community.utils.response.ApiResponse;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +54,15 @@ public class PostController {
             ApiResponse.ok(postService.getPost(postId, userId)));
     }
 
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<ApiResponse<Void>> deletePost(
+        @RequestAttribute(value = "userId") Long userId,
+        @PathVariable @Min(1) Long postId) {
+        postService.deletePost(postId, userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .build();
+    }
+
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> updatePost(
         @RequestAttribute(value = "userId") Long userId,
@@ -58,5 +70,23 @@ public class PostController {
         @RequestBody PostUpdateRequestDto req) {
         postService.update(postId, req, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.ok(null));
+    }
+
+    @PutMapping("/{postId}/users/{userId}/like")
+    public ResponseEntity<ApiResponse<TogglePostLikeResponseDto>> createLike(
+        @RequestAttribute(value = "userId") Long userId,
+        @PathVariable Long postId) {
+        var response = postService.toggleLike(postId, userId);
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
+    @GetMapping("/{postId}/images/url-patch")
+    public ResponseEntity<ApiResponse<PresignedUrlDto>> getImagePutUrl(
+        @RequestAttribute(value = "userId") Long userId,
+        @PathVariable Long postId
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(
+            postService.getPatchUrl(userId, postId)
+        ));
     }
 }

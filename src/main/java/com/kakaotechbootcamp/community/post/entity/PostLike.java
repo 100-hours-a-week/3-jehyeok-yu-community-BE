@@ -1,6 +1,6 @@
-package com.kakaotechbootcamp.community.postlike.entity;
+package com.kakaotechbootcamp.community.post.entity;
 
-import com.kakaotechbootcamp.community.post.entity.Post;
+
 import com.kakaotechbootcamp.community.user.entity.User;
 import com.kakaotechbootcamp.community.utils.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -12,12 +12,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "post_like")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE comments SET deleted_at = now() WHERE comment_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class PostLike extends BaseEntity {
 
     @Id
@@ -27,22 +29,28 @@ public class PostLike extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
+    @Getter
     private boolean isDeleted;
+
+    protected PostLike() {
+    }
 
     private PostLike(Post post, User user) {
         this.post = post;
         this.user = user;
-        this.isDeleted = false;
+        this.isDeleted = true;
     }
 
-    // 팩토리 메서드
-    static public PostLike create(Post post, User user) {
+    public static PostLike create(Post post, User user) {
         return new PostLike(post, user);
+    }
+
+    public void toggleLike() {
+        this.isDeleted = !this.isDeleted;
     }
 }

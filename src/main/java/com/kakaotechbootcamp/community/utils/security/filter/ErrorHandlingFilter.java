@@ -22,6 +22,7 @@ public class ErrorHandlingFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (FilterAuthException e) {
+            e.printStackTrace();
             filterErrorResponseWriter.write(response, e.getErrorCode());
         }
     }

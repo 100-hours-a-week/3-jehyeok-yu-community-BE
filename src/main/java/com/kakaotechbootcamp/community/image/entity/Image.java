@@ -35,4 +35,8 @@ public class Image extends BaseEntity {
     static public Image create(String originalName, String objectKey) {
         return new Image(originalName, objectKey);
     }
+
+    public void changeOriginalName(String originalName) {
+        this.originalName = originalName;
+    }
 }

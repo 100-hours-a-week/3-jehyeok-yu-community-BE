@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.post.repository;
+package com.kakaotechbootcamp.community.post.repository.postimage;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 

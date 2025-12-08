@@ -15,9 +15,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 public class BaseEntity {
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     @CreatedDate
     protected Instant createdAt;
+    @Column(name = "deleted_at")
     protected Instant deletedAt;
 
     public void deleteOn(Clock clock) {

@@ -51,4 +51,8 @@ public class UserImage extends BaseEntity {
         }
         return thumbnailObjectKey;
     }
+
+    public void changeOriginalName(String originalName) {
+        this.image.changeOriginalName(originalName);
+    }
 }

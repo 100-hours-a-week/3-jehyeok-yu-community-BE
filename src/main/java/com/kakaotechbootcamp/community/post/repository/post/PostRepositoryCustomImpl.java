@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.post.repository;
+package com.kakaotechbootcamp.community.post.repository.post;
 
 import com.kakaotechbootcamp.community.post.entity.Post;
 import com.kakaotechbootcamp.community.post.entity.QPost;

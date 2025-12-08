@@ -18,12 +18,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Slf4j
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE posts SET deleted_at = now() WHERE post_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Post extends BaseEntity {
 
     @Id
@@ -85,7 +89,6 @@ public class Post extends BaseEntity {
     }
 
     public String getObjectKey() {
-        log.info("getObject Key, {}", this.postImage);
         return this.postImage == null ? null : this.postImage.getObjectKey();
     }
 }

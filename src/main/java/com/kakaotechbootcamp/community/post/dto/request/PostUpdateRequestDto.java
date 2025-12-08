@@ -9,5 +9,5 @@ public class PostUpdateRequestDto {
 
     private final String title;
     private final String content;
-    private final Long imageId;
+    private final ImageUpdateRequestDto image;
 }

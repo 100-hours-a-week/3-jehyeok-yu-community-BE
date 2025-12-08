@@ -43,4 +43,8 @@ public class PostImage extends BaseEntity {
     public String getObjectKey() {
         return image.getObjectKey();
     }
+
+    public void changeOriginalName(String originalName) {
+        this.image.changeOriginalName(originalName);
+    }
 }
