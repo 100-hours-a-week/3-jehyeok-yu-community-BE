@@ -9,7 +9,7 @@ public class ResourcePageController {
 
     @GetMapping("/privacy")
     public String getPrivacy(Model model) {
-        model.addAttribute("serviceName", "아무 말 대잔치");
+        model.addAttribute("serviceName", "게임 인사이드");
         model.addAttribute("companyRep", "카카오테크 부트캠프");
         model.addAttribute("contactEmail", "wpgur07@gmail.com");
         model.addAttribute("lastUpdated", "2025-10-26");
@@ -18,7 +18,7 @@ public class ResourcePageController {
 
     @GetMapping("/terms")
     public String getTerms(Model model) {
-        model.addAttribute("serviceName", "아무 말 대잔치");
+        model.addAttribute("serviceName", "게임 인사이드");
         model.addAttribute("companyRep", "카카오테크 부트캠프");
         model.addAttribute("contactEmail", "wpgur07@gmail.com");
         model.addAttribute("lastUpdated", "2025-10-26");
