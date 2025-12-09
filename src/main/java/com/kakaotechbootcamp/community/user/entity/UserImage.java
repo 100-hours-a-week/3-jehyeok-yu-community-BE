@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class UserImage extends BaseEntity {
 
     @Id
+    @Column(name = "user_id")
     public Long userId;
 
     @MapsId
@@ -35,6 +36,7 @@ public class UserImage extends BaseEntity {
     private String thumbnailObjectKey;
 
     private UserImage(User user, Image image, String thumbnailObjectKey) {
+        this.userId = user.getUserId();
         this.user = user;
         this.image = image;
         this.thumbnailObjectKey = thumbnailObjectKey;
