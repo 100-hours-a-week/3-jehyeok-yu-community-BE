@@ -20,7 +20,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final String[][] EXCLUDED_PATHS = {
         {"/auth", "POST"}, {"/auth", "PUT"},
-        {"/users", "POST"}, {"/terms", "GET"}, {"/privacy", "GET"}
+        {"/users", "POST"}, {"/terms", "GET"}, {"/privacy", "GET"},
+        {"/favicon-16x16.png", "GET"}
     };
     private final JwtTokenProvider jwtTokenProvider;
 

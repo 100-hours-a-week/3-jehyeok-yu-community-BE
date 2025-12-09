@@ -70,7 +70,8 @@ public class PostService {
             User author = e.getAuthor();
             postList.add(
                 new PostThumbNailResponseDto(e.getTitle(), e.getPostId(),
-                    postLikeRepository.countByPost_PostIdAndIsDeletedFalse(e.getPostId()), 0,
+                    postLikeRepository.countByPost_PostIdAndIsDeletedFalse(e.getPostId()),
+                    e.getComments().size(),
                     e.getViewCount(),
                     e.getCreatedAt(),
                     new AuthorThumbNailDto(author.getNickname(),
@@ -99,9 +100,9 @@ public class PostService {
             .authorThumbnailPath(
                 s3ClientCreator.getPresignedGetUrl(post.getAuthor().getObjectKey()))
             .nickname(post.getAuthor().getNickname())
-            .viewCount(post.getViewCount())
+            .viewCount(post.getViewCount() + 1)
             .createdAt(post.getCreatedAt())
-            .commentCount(0)
+            .commentCount(post.getComments().size())
             .likeCount(postLikeRepository.countByPost_PostIdAndIsDeletedFalse(post.getPostId()))
             .owner(userId.equals(post.getAuthor().getUserId()))
             .isLiked(postLikeRepository.findByPost_PostIdAndUser_UserIdAndIsDeletedFalse(
