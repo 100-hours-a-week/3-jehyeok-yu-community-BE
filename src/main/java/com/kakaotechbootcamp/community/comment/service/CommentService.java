@@ -9,6 +9,7 @@ import com.kakaotechbootcamp.community.comment.entity.Comment;
 import com.kakaotechbootcamp.community.comment.execption.CommentForbiddenException;
 import com.kakaotechbootcamp.community.comment.execption.CommentNotFoundException;
 import com.kakaotechbootcamp.community.comment.repository.CommentRepository;
+import com.kakaotechbootcamp.community.image.S3ClientCreator;
 import com.kakaotechbootcamp.community.post.entity.Post;
 import com.kakaotechbootcamp.community.post.exception.PostNotFoundException;
 import com.kakaotechbootcamp.community.post.repository.post.PostRepository;
@@ -30,6 +31,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final S3ClientCreator s3ClientCreator;
 
     @Transactional
     public void createComment(Long userId, Long postId,
@@ -45,12 +47,12 @@ public class CommentService {
     }
 
     public CommentListResponseDto getCommentList(Long postId, Long userId) {
-        User author = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
 
         List<Comment> commentList = commentRepository.findByPost_postId(postId);
         return new CommentListResponseDto(
-            commentList.stream().map(c -> mapCommentToDto(c, author.getUserId()))
+            commentList.stream().map(c -> mapCommentToDto(c, user.getUserId()))
                 .toList()
         );
     }
@@ -62,7 +64,8 @@ public class CommentService {
             .contents(comment.getContent())
             .createdAt(comment.getCreatedAt())
             .authorNickname(comment.getAuthor().getNickname())
-            .authorThumbnailPath(comment.getAuthor().getObjectKey())
+            .authorThumbnailPath(
+                s3ClientCreator.getPresignedGetUrl(comment.getAuthor().getObjectKey()))
             .build();
     }
 
