@@ -1,0 +1,31 @@
+name: backend ci-cd
+
+on:
+  pull_request:
+  workflow_call:
+    
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # 테스트만 진행
+      - name: jdk 셋업
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: gradlew 실행권한 만들기
+        run: chmod +x ./gradlew
+
+      - name: 설정파일 주입
+        run: |
+          export BE_PORT=8080
+          echo "${{ secrets.APP_YML }}" > ./src/main/resources/application-prod.yml
+          echo "${{ secrets.APP_YML_COMMON }}" > ./src/main/resources/application.yml
+
+      - name: 테스트
+        run: |
+          ./gradlew test

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title th:text="|이용약관 - ${serviceName}|">이용약관</title>
+  <style>
+    body {
+      max-width: 720px;
+      margin: 24px auto;
+      padding: 0 16px 80px;
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Noto Sans KR", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1f2937;
+    }
+    header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      color: #111827;
+    }
+    .meta {
+      font-size: 12px;
+      color: #6b7280;
+      margin: 0;
+    }
+    section h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      margin: 24px 0 8px;
+    }
+    section p {
+      margin: 0 0 12px;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #6b7280;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 16px;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>이용약관</h1>
+  <p class="meta">
+    서비스명
+    <span th:text="${serviceName}">아무 말 대잔치</span>
+    /
+    대표
+    <span th:text="${companyRep}">홍길동</span>
+    /
+    시행일
+    <span th:text="${lastUpdated}">2025-10-01</span>
+  </p>
+</header>
+
+<section>
+  <h2>1. 목적</h2>
+  <p>
+    본 약관은
+    <span th:text="${serviceName}">아무 말 대잔치</span>
+    에서 제공하는 서비스의 이용 조건과 절차, 권리와 의무, 기타 필요한 사항을 규정합니다.
+  </p>
+
+  <h2>2. 계정 및 서비스 이용</h2>
+  <p>
+    사용자는 타인의 권리를 침해하지 않는 범위 내에서 자유롭게 게시물을 작성할 수 있습니다.
+    불법 정보, 타인에 대한 명예훼손, 혐오 표현 등 운영 방침을 심각하게 위반한 경우 서비스 이용이 제한될 수 있습니다.
+  </p>
+
+  <h2>3. 게시물의 책임</h2>
+  <p>
+    서비스에 게시된 모든 콘텐츠의 책임은 해당 게시물을 작성한 사용자 본인에게 있습니다.
+    <span th:text="${serviceName}">아무 말 대잔치</span>
+    는 사용자가 게시한 내용에 대해 법적인 책임을 지지 않습니다. 단, 관계 법령에 따른 정당한 요청이 있을 경우 해당 게시물은 차단 또는 삭제될 수 있습니다.
+  </p>
+
+  <h2>4. 서비스 변경 및 종료</h2>
+  <p>
+    서비스는 운영상, 기술상 필요에 따라 내용이 변경되거나 중단될 수 있습니다.
+    중요한 변경 사항이 있는 경우, 사전에 합리적인 방법으로 고지합니다.
+  </p>
+</section>
+
+<footer>
+  문의 이메일
+  <a th:href="'mailto:' + ${contactEmail}" th:text="${contactEmail}">contact@example.com</a>
+</footer>
+</body>
+</html>

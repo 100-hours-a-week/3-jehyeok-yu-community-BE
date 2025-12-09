@@ -1,7 +1,7 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.6'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.kakaotechbootcamp'
@@ -9,29 +9,41 @@ version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // validator 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // jwt, passwordEncoder 의존성
+    implementation 'org.springframework.security:spring-security-crypto:6.3.3'
+    implementation "io.jsonwebtoken:jjwt-api:0.11.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
+    implementation "io.jsonwebtoken:jjwt-jackson:0.11.5"
+
+    //thymeleaf 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     // querydsl 의존성
     def querydslVersion = "5.0.0"
@@ -39,8 +51,13 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
+    // s3Client
+    implementation platform('software.amazon.awssdk:bom:2.27.21')
+    implementation 'software.amazon.awssdk:s3'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+
+test {
+    useJUnitPlatform()
 }
